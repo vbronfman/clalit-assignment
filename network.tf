@@ -1,4 +1,4 @@
-
+# TODO where do I put network security group (NSG) and route table (RT) if any ?
 # Create a virtual network
 resource "azurerm_virtual_network" "example" {
   name                = "${var.namespace}-example-vnet"
@@ -47,6 +47,7 @@ resource "azurerm_private_endpoint" "example-_func_app" {
   }
 }
 
+# is this Private link???
 resource "azurerm_app_service_virtual_network_swift_connection" "fn_vnet_swift" {
   app_service_id = azurerm_linux_function_app.example.id
   subnet_id      = azurerm_subnet.terraform_subnet_1.id
