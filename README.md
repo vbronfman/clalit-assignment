@@ -119,6 +119,7 @@ _terraform apply -auto-aprove_
 ## Deploy
 
 terraform init
+
 terraform apply -auto-approve
 
 
