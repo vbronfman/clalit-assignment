@@ -18,7 +18,7 @@ resource "azurerm_subnet" "terraform_subnet_1" {
     name = "example-delegation"
 
     service_delegation {
-      name    = "Microsoft.Web/serverFarms"
+      name    = "Microsoft.Web/serverFarms" # ? Microsoft.Web/sites
       actions = ["Microsoft.Network/virtualNetworks/subnets/action"]
     }
   }
