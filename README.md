@@ -139,5 +139,6 @@ https://learn.microsoft.com/en-us/cli/azure/azure-cli-sp-tutorial-1?tabs=bash
 
 https://www.linkedin.com/pulse/azure-function-python-deployment-terraform-huaifeng-qin-jfjtc/
 
+https://learn.microsoft.com/en-us/azure/app-service/overview-vnet-integration
 
 
