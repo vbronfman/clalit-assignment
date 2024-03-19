@@ -107,7 +107,24 @@ _$ ACCOUNT_KEY=$(az storage account keys list --resource-group "tfstate" --accou
 
 _export ARM_ACCESS_KEY=$ACCOUNT_KEY_
 
+9. Update terraform.tf with number of actual number
 
+terraform {
+   
+  backend "azurerm" {
+  
+    resource_group_name  = "tfstate"
+ 
+    storage_account_name = "tfstorageaccountc9or8"
+    
+    container_name       = "terraformstate"
+    
+    key                  = "terraform.tfstate"
+    
+  }
+  
+}
+    
 
 ### 4. Set up the following components using Terraform azurerm 
 - Resourcegroup
