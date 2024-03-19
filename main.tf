@@ -42,6 +42,7 @@ data "archive_file" "function" {
   source_dir  = "${path.module}/fastapi-on-azure-functions"
 }
 
+/* commented FOR DEBUG ONLY!!! have to uncomment!
 # Create a function app
 resource "azurerm_linux_function_app" "example" {
   name                      = "${var.namespace}-${var.function_app_name}"
@@ -52,12 +53,13 @@ resource "azurerm_linux_function_app" "example" {
   storage_account_access_key = azurerm_storage_account.example.primary_access_key
 ### 
   functions_extension_version = "~4" # ?
-/*
-  identity {
-    type         = "UserAssigned"
-    identity_ids = [var.azurerm_function_app_identity_id]
-  }
-*/  
+
+#  # how to use it, for heaven sake?
+#  identity {
+#    type         = "UserAssigned"
+#    identity_ids = [var.azurerm_function_app_identity_id]
+#  }
+  
 
     app_settings = {
     "ENABLE_ORYX_BUILD"              = "true"
@@ -77,7 +79,7 @@ resource "azurerm_linux_function_app" "example" {
 #application source
     zip_deploy_file = data.archive_file.function.output_path
 }
-
+*/
 # Create a diagnostic settings for the function app
 
 /* Error "AuditEvent" not supported"
