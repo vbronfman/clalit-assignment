@@ -1,8 +1,12 @@
 
 # Create a resource group
 resource "azurerm_resource_group" "example" {
-  name     = var.resource_group_name
+  name     = "${var.namespace}-rg"
   location = var.location
+    lifecycle {
+        ignore_changes = []
+
+    }
 }
 
 
@@ -20,7 +24,7 @@ resource "azurerm_storage_account" "example" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   # account_kind             = "Storage" # ?
-
+  
   tags = {
     environment = "clalit-assignment"
   }
@@ -42,8 +46,16 @@ data "archive_file" "function" {
   source_dir  = "${path.module}/fastapi-on-azure-functions"
 }
 
-/* commented FOR DEBUG ONLY!!! have to uncomment!
-# Create a function app
+# Create an application service plan
+resource "azurerm_service_plan" "example" {
+  name                = "${var.namespace}-app-service-plan"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  os_type             = "Linux"
+  sku_name            = "P1v2" 
+}
+
+# Create a Function App
 resource "azurerm_linux_function_app" "example" {
   name                      = "${var.namespace}-${var.function_app_name}"
   resource_group_name       = azurerm_resource_group.example.name
@@ -51,45 +63,54 @@ resource "azurerm_linux_function_app" "example" {
   service_plan_id           = azurerm_service_plan.example.id
   storage_account_name      = azurerm_storage_account.example.name
   storage_account_access_key = azurerm_storage_account.example.primary_access_key
-### 
+ 
   functions_extension_version = "~4" # ?
-
-#  # how to use it, for heaven sake?
-#  identity {
-#    type         = "UserAssigned"
-#    identity_ids = [var.azurerm_function_app_identity_id]
-#  }
   
-
-    app_settings = {
-    "ENABLE_ORYX_BUILD"              = "true"
-    "SCM_DO_BUILD_DURING_DEPLOYMENT" = "true"
-    "FUNCTIONS_WORKER_RUNTIME"       = "python"
-    "AzureWebJobsFeatureFlags"       = "EnableWorkerIndexing"
-    "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.application_insight.instrumentation_key
+  app_settings = {
+      "ENABLE_ORYX_BUILD"              = "true"
+      "SCM_DO_BUILD_DURING_DEPLOYMENT" = "true"
+      "FUNCTIONS_WORKER_RUNTIME"       = "python"
+      "AzureWebJobsFeatureFlags"       = "EnableWorkerIndexing"
+      "APPINSIGHTS_INSTRUMENTATIONKEY" = azurerm_application_insights.application_insight.instrumentation_key
     }
+
   site_config {
-    runtime_scale_monitoring_enabled = true
+    runtime_scale_monitoring_enabled = false
     vnet_route_all_enabled           = true
     application_stack {
       python_version = "3.11"
     }  
   }
 
-#application source
+# Application source - zip archive in current directory
     zip_deploy_file = data.archive_file.function.output_path
+
+    lifecycle {
+        precondition {
+            condition     = azurerm_service_plan.example.os_type == "Linux"
+            error_message = "The selected plan must be for the Linux architecture."
+        }
+    }
 }
-*/
+
+
 # Create a diagnostic settings for the function app
-
-/* Error "AuditEvent" not supported"
+/* Error "AuditEvent" not supported" Didn't work for me... 
 resource "azurerm_monitor_diagnostic_setting" "example" {
-  name               = "example-diagnostic-settings"
+  name               = "${var.namespace}-monitor-diagnostic"
   target_resource_id = azurerm_linux_function_app.example.id
-  log_analytics_workspace_id = azurerm_log_analytics_workspace.example.id
+  storage_account_id = azurerm_storage_account.example.id
 
-    enabled_log {
+  enabled_log {
     category = "AuditEvent"
+
+    retention_policy {
+      enabled = false
+    }
+  }
+
+  metric {
+    category = "AllMetrics"
 
     retention_policy {
       enabled = false
@@ -107,21 +128,12 @@ resource "azurerm_log_analytics_workspace" "example" {
   sku                 = "PerGB2018"
 }
 
-# Create an application service plan
-resource "azurerm_service_plan" "example" {
-  name                = "example-app-service-plan"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  os_type             = "Linux"
-  sku_name            = "P1v2" 
-    
-}
 
-/*
+# Create assigned identity 
 resource "azurerm_user_assigned_identity" "funcid" {
   name                = "${var.namespace}-id"
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
 }
-*/
+
 

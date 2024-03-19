@@ -4,6 +4,10 @@ terraform {
       source = "hashicorp/azurerm"
       version = "~>3.0"
     }
+    shell = {
+      source = "scottwinkler/shell"
+      version = "1.7.7"
+    }
   }
 }
 
@@ -14,7 +18,6 @@ provider "azurerm" {
     }
   }
 
-
 /*
   subscription_id   = "${env.ARM_SUBSCRIPTION_ID}"
   tenant_id         = "${env.ARM_TENANT_ID}"
@@ -23,4 +26,9 @@ provider "azurerm" {
 */
 }
 
-# Your code goes here
+provider "shell" {
+    #interpreter = ["/usr/bin/bash", "-c"]
+    interpreter = ["C:\\Program Files\\Git\\bin\\bash.exe", "-c"]
+    enable_parallelism = false
+}
+
