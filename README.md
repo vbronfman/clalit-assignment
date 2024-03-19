@@ -89,6 +89,23 @@ _terraform init_
 _terraform apply -auto-aprove_
 
 
+8. Create storage for state
+   
+https://learn.microsoft.com/en-us/azure/developer/terraform/store-state-in-azure-storage?tabs=terraform#2-configure-remote-state-storage-account  
+
+To configure the backend state, you need the following Azure storage information:
+
+__storage_account_name__: The name of the Azure Storage account.
+
+__container_name__: The name of the blob container.
+
+__key__: The name of the state store file to be created.
+
+__access_key__: The storage access key.
+
+_$ ACCOUNT_KEY=$(az storage account keys list --resource-group "tfstate" --account-name tfstorageaccount3bfa6 --query '[0].value' -o tsv)_
+
+_export ARM_ACCESS_KEY=$ACCOUNT_KEY_
 
 
 
